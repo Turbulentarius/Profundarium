@@ -1,0 +1,133 @@
+<?php
+
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
+use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
+
+Route::get('/notes/{note?}', function (?string $note = null) {
+    $hedgedocUrl = rtrim(config('services.hedgedoc.url'), '/');
+
+    if ($note === null) {
+        $path = resource_path('notes/default.md');
+        abort_unless(is_readable($path), 404);
+        $markdown = file_get_contents($path);
+    } else {
+        $response = Http::get("{$hedgedocUrl}/{$note}/download");
+
+        abort_unless($response->successful(), 404);
+        $markdown = $response->body();
+    }
+
+    $robots = null;
+    if (preg_match('/\A---\r?\n(.*?)\r?\n---(?:\r?\n|$)/s', $markdown, $frontMatter)) {
+        foreach (preg_split('/\r?\n/', $frontMatter[1]) as $line) {
+            if (preg_match('/^\s*robots\s*:\s*(.*?)\s*$/i', $line, $match)) {
+                $robots = trim($match[1], " \t\"'");
+                break;
+            }
+        }
+
+        $markdown = substr($markdown, strlen($frontMatter[0]));
+    }
+
+    $html = Str::markdown($markdown, [
+            'html_input' => 'allow',
+            'heading_permalink' => [
+                'apply_id_to_heading' => true,
+                'fragment_prefix' => '',
+                'id_prefix' => '',
+                'insert' => 'none',
+            ],
+            'disallowed_raw_html' => [
+                'disallowed_tags' => [
+                    'title',
+                    'textarea',
+                    'xmp',
+                    'iframe',
+                    'noembed',
+                    'noframes',
+                    'script',
+                    'plaintext',
+                ],
+            ],
+        ], [new HeadingPermalinkExtension()]);
+
+    $headings = [];
+    $html = preg_replace_callback(
+        '/<h([1-6]) id="([^"]+)">(.*?)<\/h\1>/s',
+        function (array $match) use (&$headings): string {
+            $headings[] = [
+                'level' => (int) $match[1],
+                'id' => $match[2],
+                'label' => strip_tags($match[3]),
+            ];
+
+            return $match[0];
+        },
+        $html,
+    );
+
+    if ($headings !== []) {
+        // Nest under the preceding shallower heading, even when levels are skipped.
+        $renderList = function (int &$index, int $parentLevel = 0) use (&$renderList, $headings): string {
+            $list = '<ul>';
+
+            while ($index < count($headings) && $headings[$index]['level'] > $parentLevel) {
+                $heading = $headings[$index++];
+                $list .= sprintf(
+                    '<li class="toc-level-%d"><a href="#%s">%s</a>',
+                    $heading['level'],
+                    e($heading['id']),
+                    e($heading['label']),
+                );
+
+                if ($index < count($headings) && $headings[$index]['level'] > $heading['level']) {
+                    $list .= $renderList($index, $heading['level']);
+                }
+
+                $list .= '</li>';
+            }
+
+            return $list . '</ul>';
+        };
+
+        $index = 0;
+        $toc = '<nav class="toc" aria-label="Table of contents">'
+            . $renderList($index)
+            . '</nav>';
+        $html = str_replace('<p>[TOC]</p>', $toc, $html);
+    }
+
+    // Rewrite actual anchor URLs, including links written as raw HTML in Markdown.
+    // Leave other sites, images, code examples, and TOC fragments unchanged.
+    // Explicit body keeps leading <style> blocks in the note fragment.
+    $document = \Dom\HTMLDocument::createFromString(
+        '<!DOCTYPE html><html><head></head><body>' . $html . '</body></html>',
+        LIBXML_NOERROR,
+        'UTF-8',
+    );
+    $sourceUrlPattern = preg_quote(preg_replace('~^https?:~i', '', $hedgedocUrl), '~');
+    foreach ($document->getElementsByTagName('a') as $link) {
+        $href = $link->getAttribute('href');
+        if (preg_match('~^(?:(?:https?:)?' . $sourceUrlPattern . ')?/?s/([A-Za-z0-9_-]+)([?#].*)?$~i', $href, $match)) {
+            $link->setAttribute('href', '/notes/' . $match[1] . ($match[2] ?? ''));
+        }
+    }
+
+    $html = '';
+    foreach ($document->body->childNodes as $node) {
+        $html .= $document->saveHtml($node);
+    }
+
+    $response = response()->view('note', [
+        'html' => $html,
+        'title' => trim($document->getElementsByTagName('h1')->item(0)?->textContent ?? ''),
+    ]);
+
+    if ($robots !== null) {
+        $response->header('X-Robots-Tag', $robots);
+    }
+
+    return $response;
+});

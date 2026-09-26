@@ -1,0 +1,338 @@
+/* Includes adapted HedgeDoc TOC rules. See THIRD_PARTY_NOTICES.md and licenses/HedgeDoc-AGPL-3.0.txt. */
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(../fonts/roboto/roboto-italic-400.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 500;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(../fonts/roboto/roboto-italic-500.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 700;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(../fonts/roboto/roboto-italic-700.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(../fonts/roboto/roboto-normal-400.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(../fonts/roboto/roboto-normal-500.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: normal;
+  font-display: swap;
+  src: url(../fonts/roboto/roboto-normal-700.woff2) format('woff2');
+}
+
+:root {
+    color-scheme: light;
+    --paper: #ffffff;
+    --ink: #24292f;
+    --muted: #57606a;
+    --accent: #0969da;
+    --line: #d0d7de;
+    --code: #f6f8fa;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 48px 0;
+    background: #ffffff;
+    color: var(--ink);
+    font-family: "Roboto", Helvetica, Arial, sans-serif;
+    letter-spacing: 0.025em;
+    font-size: 14px;
+}
+
+.note {
+    width: 100%;
+    max-width: 758px;
+    margin: 0 auto;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+.note h1,
+.note h2,
+.note h3,
+.note h4,
+.note h5,
+.note h6 {
+    color: var(--ink);
+    line-height: 1.25;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.35em;
+}
+
+.note h1 {
+    margin: 0 0 28px;
+    font-size: 2em;
+}
+
+.note h2 {
+    margin: 2.2em 0 0.65em;
+    font-size: 1.5em;
+}
+
+.note h3,
+.note h4 {
+    margin: 1.8em 0 0.55em;
+}
+
+.note h3 {
+    font-size: 1.25em;
+}
+
+.note p,
+.note li {
+    font-size: 1.08rem;
+    line-height: 1.78;
+}
+
+.note p {
+    margin: 0 0 1.1em;
+}
+
+nav.toc {
+    max-height: 70vh;
+    margin: 23px 0 20px;
+    padding: 0.8rem;
+    overflow: auto;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1.4rem;
+    line-height: 1.35;
+    min-width: 200px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Keep the TOC navigation independent of the article link/list styles below. */
+nav.toc ul {
+    margin: 0;
+    padding: 0 0 0 0.5rem;
+    list-style: none;
+    counter-reset: toc-item;
+}
+
+nav.toc li {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    line-height: 1.35;
+    list-style: none;
+    counter-increment: toc-item;
+}
+
+nav.toc > ul > li {
+    margin-bottom: 6px;
+}
+
+nav.toc li::before {
+    content: counters(toc-item, ".") ".";
+    color: rgba(0, 0, 0, 0.55);
+    font-size: 0.92rem;
+    text-align: right;
+}
+
+nav.toc li > ul {
+    grid-column: 1 / -1;
+    margin-top: 0.2rem;
+    padding-left: 0.9rem;
+}
+
+nav.toc li ul li::before {
+    font-size: 0.88rem;
+}
+
+nav.toc a {
+    display: block;
+    overflow: hidden;
+    padding: 0 0.3rem;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: pre;
+}
+
+nav.toc a:hover,
+nav.toc a:focus {
+    padding-left: 0.4rem;
+    border-left: 1px solid black;
+    text-decoration: none;
+}
+
+a {
+    color: var(--accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+
+/* Article lists: native markers and numbering, independent of the TOC. */
+.note :where(ul, ol):not(:where(.toc *)) {
+    margin: 0 0 1.25em;
+    padding-inline-start: 1.65em;
+    font-size: 1.08rem;
+    list-style-position: outside;
+}
+
+.note ul:not(:where(.toc *)) {
+    list-style-type: disc;
+}
+
+.note li:not(:where(.toc *)) {
+    padding-inline-start: 0.3em;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+}
+
+.note li:not(:where(.toc *)) + li {
+    margin-top: 0.45em;
+}
+
+.note li:not(:where(.toc *))::marker {
+    color: var(--muted);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.note li > :where(ul, ol):not(:where(.toc *)) {
+    margin-block: 0.45em 0;
+    padding-inline-start: 1.4em;
+}
+
+.note li > ul:not(:where(.toc *)) {
+    list-style-type: circle;
+}
+
+.note li li > ul:not(:where(.toc *)) {
+    list-style-type: square;
+}
+
+.note li:not(:where(.toc *)) > p {
+    margin-block: 0 0.55em;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.note li:not(:where(.toc *)) > :last-child {
+    margin-bottom: 0;
+}
+
+.note blockquote {
+    margin: 1.6em 0;
+    padding: 0.3em 1.2em;
+    border-left: 4px solid var(--line);
+    color: var(--muted);
+}
+
+.note code {
+    padding: 0.15em 0.35em;
+    background: var(--code);
+    border-radius: 3px;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.88em;
+}
+
+.note pre {
+    overflow-x: auto;
+    padding: 18px;
+    background: #f6f8fa;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+}
+
+.note pre code {
+    padding: 0;
+    background: transparent;
+    color: inherit;
+}
+
+.note hr {
+    margin: 2.5em 0;
+    border: 0;
+    border-top: 2px solid var(--line);
+}
+
+.note img {
+    max-width: 100%;
+    height: auto;
+}
+
+.note table {
+    width: 100%;
+    margin: 1.5em 0;
+    border-collapse: collapse;
+    font-size: 0.98rem;
+}
+
+.note th,
+.note td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+}
+
+.note th {
+    color: var(--muted);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+@media (max-width: 560px) {
+    body {
+        padding: 0;
+    }
+
+    .note {
+        min-height: 100vh;
+        padding: 28px 22px 48px;
+    }
+
+}
+
+@media print {
+    body {
+        padding: 0;
+    }
+
+    .note {
+        width: 100%;
+        padding: 0;
+    }
+}
