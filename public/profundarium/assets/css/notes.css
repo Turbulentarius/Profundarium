@@ -290,6 +290,10 @@ a {
 
 .note img {
     max-width: 100%;
+}
+
+/* Preserve explicit Markdown/HTML heights; otherwise scale proportionally. */
+.note img:not([height]) {
     height: auto;
 }
 

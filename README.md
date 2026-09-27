@@ -118,6 +118,10 @@ Profundarium forwards no login credentials to HedgeDoc. Its renderer preserves r
 HTML, including note `<style>` blocks, so configure a source whose note content
 you trust; it is not a general-purpose HTML sanitizer.
 
+Images support HedgeDoc's numeric size suffixes: `![Alt text](URL =380x)`
+sets width, `=x240` sets height, and `=380x240` sets both. Alt text is preserved,
+and image examples inside inline or fenced code remain literal.
+
 To print or save a note as PDF, use your browser's print menu.
 
 ## Tests
