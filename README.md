@@ -81,6 +81,28 @@ Visit `http://127.0.0.1:8000/profundarium`. For another web server, its document
 be `public/`; `storage/` and `bootstrap/cache/` must be writable by PHP.
 Use `APP_DEBUG=false` when making an instance publicly accessible.
 
+## Static asset URLs
+
+CSS and fonts live in `public/profundarium/assets/css/` and
+`public/profundarium/assets/fonts/`. The stylesheet uses the root-relative URL
+`/profundarium/assets/css/notes.css`, so HTTPS pages also load assets over HTTPS.
+Relative font URLs resolve under the same asset prefix.
+
+Sandboxer's Apache and `php artisan serve` serve these files directly from
+`public/`, without aliases. For Nginx serving the public directory at
+`/srv/profundarium/public`, use:
+
+```nginx
+location ^~ /profundarium/assets/ {
+    root /srv/profundarium/public;
+    try_files $uri =404;
+}
+```
+
+A containerized Nginx must have the application's public directory mounted at
+that path (read-only is sufficient). Replace any previous asset alias to
+`/srv/profundarium/public/` with this mapping when deploying the moved files.
+
 ## Routes and notes
 
 - `/profundarium` renders the bundled introduction in `resources/notes/default.md`.
