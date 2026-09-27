@@ -15,8 +15,20 @@ Route::get('/profundarium/{note?}', function (?string $note = null) {
     } else {
         $response = Http::get("{$hedgedocUrl}/{$note}/download");
 
-        abort_unless($response->successful(), 404);
-        $markdown = $response->body();
+        $contentType = strtolower((string) $response->header('Content-Type'));
+        $isForbidden = in_array($response->status(), [401, 403], true)
+            || str_contains($contentType, 'text/html');
+
+        if ($isForbidden) {
+            $path = resource_path('notes/not-found.md');
+            abort_unless(is_readable($path), 404);
+            $markdown = file_get_contents($path);
+            $status = 404;
+        } else {
+            abort_unless($response->successful(), 404);
+            $markdown = $response->body();
+            $status = 200;
+        }
     }
 
     $robots = null;
@@ -30,6 +42,18 @@ Route::get('/profundarium/{note?}', function (?string $note = null) {
 
         $markdown = substr($markdown, strlen($frontMatter[0]));
     }
+
+    $markdown = preg_replace_callback(
+        '~!\[([^\]]*)\]\((https?://[^\s)]+)\s+=x([1-9][0-9]*)\)~i',
+        function (array $match): string {
+            $alt = htmlspecialchars($match[1], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $src = htmlspecialchars($match[2], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $width = (int) $match[3];
+
+            return "<div><img src=\"{$src}\" alt=\"{$alt}\" width=\"{$width}\"></div>";
+        },
+        $markdown,
+    );
 
     $html = Str::markdown($markdown, [
             'html_input' => 'allow',
@@ -107,11 +131,11 @@ Route::get('/profundarium/{note?}', function (?string $note = null) {
         LIBXML_NOERROR,
         'UTF-8',
     );
-    $sourceUrlPattern = preg_quote(preg_replace('~^https?:~i', '', $hedgedocUrl), '~');
     foreach ($document->getElementsByTagName('a') as $link) {
         $href = $link->getAttribute('href');
-        if (preg_match('~^(?:(?:https?:)?' . $sourceUrlPattern . ')?/?s/([A-Za-z0-9_-]+)([?#].*)?$~i', $href, $match)) {
-            $link->setAttribute('href', '/profundarium/' . $match[1] . ($match[2] ?? ''));
+        if (preg_match('~^(?:https?:)?//[^/]+/(?:s/([A-Za-z0-9_-]+)|([A-Za-z0-9_-]{16,}))([?#].*)?$~i', $href, $match)) {
+            $noteId = $match[1] !== '' ? $match[1] : $match[2];
+            $link->setAttribute('href', '/profundarium/' . $noteId . ($match[3] ?? ''));
         }
     }
 
@@ -123,7 +147,7 @@ Route::get('/profundarium/{note?}', function (?string $note = null) {
     $response = response()->view('note', [
         'html' => $html,
         'title' => trim($document->getElementsByTagName('h1')->item(0)?->textContent ?? ''),
-    ]);
+    ], $status ?? 200);
 
     if ($robots !== null) {
         $response->header('X-Robots-Tag', $robots);
