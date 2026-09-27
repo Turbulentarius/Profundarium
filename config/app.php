@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Beamtic MarkPress'),
+    'name' => env('APP_NAME', 'Beamtic Profundarium'),
 
     /*
     |--------------------------------------------------------------------------

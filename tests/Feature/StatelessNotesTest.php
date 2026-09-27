@@ -12,10 +12,10 @@ class StatelessNotesTest extends TestCase
         Http::preventStrayRequests();
         config(['database.default' => 'unused']);
 
-        $response = $this->get('/notes');
+        $response = $this->get('/profundarium');
 
         $response->assertOk();
-        $response->assertSee('Beamtic MarkPress');
+        $response->assertSee('Beamtic Profundarium');
         $this->assertSame([], $response->headers->getCookies());
         Http::assertNothingSent();
     }
@@ -29,7 +29,7 @@ class StatelessNotesTest extends TestCase
         Http::preventStrayRequests();
         Http::fake(['http://hedgedoc:3000/example/download' => Http::response('# Example')]);
 
-        $response = $this->get('/notes/example');
+        $response = $this->get('/profundarium/example');
 
         $response->assertOk();
         $response->assertSee('<title>Example</title>', false);

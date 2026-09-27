@@ -22,12 +22,12 @@ class NoteStylesTest extends TestCase
 MD),
         ]);
 
-        $response = $this->get('/notes/style-check');
+        $response = $this->get('/profundarium/style-check');
 
         $response->assertOk();
         $response->assertSee('<style>.note h1 { color: rgb(123, 45, 67); }</style>', false);
         $response->assertSee('<style media="screen">.note p { font-weight: 500; }</style>', false);
-        $response->assertSee('href="/notes/AnotherNote?view=1#section"', false);
+        $response->assertSee('href="/profundarium/AnotherNote?view=1#section"', false);
         $response->assertSee('id="styled-note"', false);
     }
 }

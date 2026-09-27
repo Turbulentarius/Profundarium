@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
 
-Route::get('/notes/{note?}', function (?string $note = null) {
+Route::get('/profundarium/{note?}', function (?string $note = null) {
     $hedgedocUrl = rtrim(config('services.hedgedoc.url'), '/');
 
     if ($note === null) {
@@ -111,7 +111,7 @@ Route::get('/notes/{note?}', function (?string $note = null) {
     foreach ($document->getElementsByTagName('a') as $link) {
         $href = $link->getAttribute('href');
         if (preg_match('~^(?:(?:https?:)?' . $sourceUrlPattern . ')?/?s/([A-Za-z0-9_-]+)([?#].*)?$~i', $href, $match)) {
-            $link->setAttribute('href', '/notes/' . $match[1] . ($match[2] ?? ''));
+            $link->setAttribute('href', '/profundarium/' . $match[1] . ($match[2] ?? ''));
         }
     }
 

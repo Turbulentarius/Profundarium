@@ -1,4 +1,4 @@
-# Beamtic MarkPress
+# Beamtic Profundarium
 
 Open the start page at [localhost](http://localhost/).
 
@@ -6,4 +6,4 @@ Open the start page at [localhost](http://localhost/).
 
 - Open HedgeDoc at [hedgedoc.localhost](http://hedgedoc.localhost).
 - Create or edit a note there.
-- Visit `/notes/<note-id>` to render it as HTML.
+- Visit `/profundarium/<note-id>` to render it as HTML.

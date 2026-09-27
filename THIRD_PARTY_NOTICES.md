@@ -5,7 +5,7 @@
 Parts of `public/css/notes.css` adapt the TOC rules from HedgeDoc's
 [`extra.css`](https://github.com/Turbulentarius/hedgedoc/blob/9a493dbd38fef038ce9d95ae0009c8d026035547/public/css/extra.css)
 and [`site.css`](https://github.com/Turbulentarius/hedgedoc/blob/72337e7f8fa406609c877c2a7f4da00f53a6dd98/public/css/site.css).
-The adaptations target MarkPress's note markup and combine those rules with
+The adaptations target Profundarium's note markup and combine those rules with
 its application stylesheet. Credit belongs to the HedgeDoc contributors.
 
 The upstream repository supplies the GNU Affero General Public License,

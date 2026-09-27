@@ -1,6 +1,6 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "turbulentarius/markpress",
+    "name": "turbulentarius/profundarium",
     "type": "project",
     "description": "Render HedgeDoc Markdown notes as HTML for reading, printing, and browser PDF export.",
     "keywords": [

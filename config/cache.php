@@ -10,6 +10,6 @@ return [
             'lock_path' => storage_path('framework/cache/data'),
         ],
     ],
-    'prefix' => env('CACHE_PREFIX', 'markpress-cache-'),
+    'prefix' => env('CACHE_PREFIX', 'profundarium-cache-'),
     'serializable_classes' => false,
 ];

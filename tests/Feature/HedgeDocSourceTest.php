@@ -17,10 +17,10 @@ class HedgeDocSourceTest extends TestCase
             ),
         ]);
 
-        $response = $this->get('/notes/example');
+        $response = $this->get('/profundarium/example');
         $response->assertOk();
-        $response->assertSee('href="/notes/Local123"', false);
-        $response->assertSee('href="/notes/Linked123?x=1#section"', false);
+        $response->assertSee('href="/profundarium/Local123"', false);
+        $response->assertSee('href="/profundarium/Linked123?x=1#section"', false);
         $response->assertSee('href="https://other.example.test/s/Other123"', false);
         Http::assertSent(fn ($request) => $request->url() === 'https://notes.example.test/wiki/example/download');
     }
