@@ -149,9 +149,7 @@ Route::get('/profundarium/{note?}', function (?string $note = null) {
         'title' => trim($document->getElementsByTagName('h1')->item(0)?->textContent ?? ''),
     ], $status ?? 200);
 
-    if ($robots !== null) {
-        $response->header('X-Robots-Tag', $robots);
-    }
+    $response->header('X-Robots-Tag', $robots ?? 'noindex, nofollow');
 
     return $response;
 });
