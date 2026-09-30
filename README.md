@@ -58,6 +58,14 @@ HEDGEDOC_URL=http://hedgedoc:3000
 running outside that network, set a reachable URL, for example
 `https://notes.example.com`. Profundarium fetches `<base-url>/<note-id>/download`.
 
+Note-link rewriting recognizes the incoming request's host automatically, as
+well as `HEDGEDOC_URL`. This supports a shared public hostname for HedgeDoc and
+Profundarium while fetching notes over Docker's internal network. The reverse
+proxy must preserve the public Host header (or supply forwarded host information
+through Laravel's configured trusted proxies). HTTP and HTTPS links are both
+recognized. A different public HedgeDoc hostname cannot be inferred from the
+request; unrelated hosts are left unchanged.
+
 After changing settings, clear any cached configuration:
 
 ```sh

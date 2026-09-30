@@ -54,4 +54,37 @@ MD)]);
         }
     }
 
+    public function test_public_links_are_rewritten_while_fetching_from_internal_host(): void
+    {
+        config([
+            'services.hedgedoc.url' => 'http://hedgedoc:3000',
+        ]);
+        Http::preventStrayRequests();
+        Http::fake(['http://hedgedoc:3000/example/download' => Http::response(<<<'MD'
+[Public](https://public.example.test/s/Public123?view=1#section)
+[HTTP](http://public.example.test/s/Http123)
+[Protocol relative](//public.example.test/s/Protocol123)
+[Direct](https://public.example.test/abcdefghijklmnop)
+[Internal](http://hedgedoc:3000/s/Internal123)
+[Relative](/s/Relative123)
+[Other](https://other.example.test/s/Other123)
+[Lookalike](https://public.example.test.evil.test/s/Other123)
+MD)]);
+        $response = $this->get('https://public.example.test/profundarium/example');
+        $response->assertOk();
+        foreach ([
+            '/profundarium/Public123?view=1#section',
+            '/profundarium/Http123',
+            '/profundarium/Protocol123',
+            '/profundarium/abcdefghijklmnop',
+            '/profundarium/Internal123',
+            '/profundarium/Relative123',
+            'https://other.example.test/s/Other123',
+            'https://public.example.test.evil.test/s/Other123',
+        ] as $href) {
+            $response->assertSee('href="' . $href . '"', false);
+        }
+        Http::assertSent(fn ($request) => $request->url() === 'http://hedgedoc:3000/example/download');
+    }
+
 }

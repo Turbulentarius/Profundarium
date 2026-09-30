@@ -1,12 +1,13 @@
 <?php
 
 use App\Markdown\SizedImageExtension;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
 
-Route::get('/profundarium/{note?}', function (?string $note = null) {
+Route::get('/profundarium/{note?}', function (Request $request, ?string $note = null) {
     $hedgedocUrl = rtrim(config('services.hedgedoc.url'), '/');
 
     if ($note === null) {
@@ -120,7 +121,12 @@ Route::get('/profundarium/{note?}', function (?string $note = null) {
         LIBXML_NOERROR,
         'UTF-8',
     );
-    $sourceUrlPattern = preg_quote(preg_replace('~^https?:~i', '', $hedgedocUrl), '~');
+    // Recognize the public request host as well as the internal fetch URL.
+    $linkSources = [$hedgedocUrl, $request->getSchemeAndHttpHost()];
+    $sourceUrlPattern = '(?:' . implode('|', array_map(
+        fn (string $url): string => preg_quote(preg_replace('~^https?:~i', '', rtrim($url, '/')), '~'),
+        array_unique($linkSources),
+    )) . ')';
     $noteLinkPattern = '~^(?:(?:(?:https?:)?' . $sourceUrlPattern . ')?/?s/([A-Za-z0-9_-]+)'
         . '|(?:https?:)?' . $sourceUrlPattern . '/([A-Za-z0-9_-]{16,}))([?#].*)?$~i';
     foreach ($document->getElementsByTagName('a') as $link) {
