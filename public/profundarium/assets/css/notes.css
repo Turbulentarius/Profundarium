@@ -71,6 +71,9 @@ body {
     font-family: "Roboto", Helvetica, Arial, sans-serif;
     letter-spacing: 0.025em;
     font-size: 14px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 .note {
@@ -274,12 +277,15 @@ a {
     color: var(--ink);
     border: 1px solid var(--line);
     border-radius: 4px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
 .note pre code {
     padding: 0;
     background: transparent;
     color: inherit;
+    overflow-wrap: anywhere;
 }
 
 .note hr {
